@@ -29,13 +29,13 @@ def WesternToneIndex():#finds indecies where tones do exist (outputs list with i
 def SlideToTone(spectrogram,ToneIndexList):#"slides" tones to correct indecies(western tones) + deletes rest of the indecies
     freqAmount=[]#hey
     for h in range(len(spectrogram)):
-        freqAmount.append(0)
+        freqAmount.append(0)#1975.53
     newSpec=[]
     for i in range(len(spectrogram)):
         newSpec.append([])
         for y in range(len(spectrogram[0])):
             newSpec[i].append(0)
-    for frequencyIndex in range(380):#len(spectrogram) 380-->2000hz
+    for frequencyIndex in range(367):#len(spectrogram) 380-->2000hz
         closestFreq=find_closest_number(frequencyIndex,ToneIndexList)
         freqAmount[closestFreq]=freqAmount[closestFreq]+1
         for TimeIndex in range(len(spectrogram[0])):
@@ -53,6 +53,15 @@ def FlippArray(inputArray):#flips array: Data[notenum][frame]-->Data[frame][note
     flipped=np.array(flipped)
     return flipped
 
+def fractionalize(inputList):
+  newList=[]
+  ogList=inputList
+  largest=sorted(inputList)[-1]
+  if largest==0:
+    largest=1
+  for i in range(len(ogList)):
+    newList.append(ogList[i]/largest)
+  return newList
 
 #Gives you a list MusicData[frame][midinum-37] (midinum strarts at 37) 37-108 [108 is just extra data for recognition ok to remove later...]
 def GetToneData(audio_path,duration,offset):#43.07 tics/second
@@ -61,5 +70,6 @@ def GetToneData(audio_path,duration,offset):#43.07 tics/second
     CleanD=SlideToTone(D,WesternToneIndex())
     DW=CleanD[WesternToneIndex()]
     FlippedD=FlippArray(DW)
+    for i in range(len(FlippedD)):
+        FlippedD[i]=fractionalize(FlippedD[i])
     return FlippedD #returns array as MusicData[frame][midinum(-37)]
-#also the data is not a int or float but some weird data with e's and powers of 10. Might wanna fix that!!
